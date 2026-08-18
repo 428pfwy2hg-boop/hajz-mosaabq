@@ -24,4 +24,12 @@ s = s.replace(old_render, new_render)
 
 s = s.replace('أرسل موقعك الحالي للسائق، ثم أكّد الحجز المسبق', 'أرسل موقعك الحالي وموقع الوجهة للسائق، ثم أكّد الحجز المسبق')
 
+# Force the deployed site to use the real JPG asset instead of the old broken base64 loader.
+if 'site-bg.jpg?v=5' not in s:
+    s = s.replace('</style>', 'body{background-image:linear-gradient(180deg,rgba(2,5,4,.30),rgba(2,6,4,.70)),url(\"site-bg.jpg?v=5\")!important;background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-attachment:fixed!important}body:before{background:linear-gradient(180deg,rgba(2,5,4,.16),rgba(2,6,4,.58) 72%,rgba(2,6,4,.82))!important}</style>', 1)
+
+needle = 'function loadBackground(){'
+if needle in s and 'site-bg.jpg?v=5' not in s[s.find(needle):s.find(needle)+220]:
+    s = s.replace(needle, 'function loadBackground(){document.body.style.backgroundImage=\"linear-gradient(180deg,rgba(2,5,4,.30),rgba(2,6,4,.70)),url(\\\'site-bg.jpg?v=5\\\')\";return;', 1)
+
 p.write_text(s, encoding='utf-8')
